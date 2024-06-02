@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <conio.h>
 
+struct employee {
+    char id[50];
+    char password[50];
+};
 
 struct user {
     char phone[50];
@@ -12,10 +16,6 @@ struct user {
     float balance;
 };
 
-struct Airline {
-    char name[100];
-    float ticketPrice;
-};
 
 void payBill(struct user *usr) {
     char meterNumber[50];
@@ -70,35 +70,6 @@ void loadESewa(struct user *usr) {
     printf("Amount Rs.%.2f successfully transferred from your account to eSewa number %s. Your new balance is Rs.%.2f\n", loadAmount, esewaNumber, usr->balance);
 }
 
-void bookAirlineTicket() {
-    struct Airline airlines[3];
-
-    strcpy(airlines[0].name, "Buddha Air");
-    airlines[0].ticketPrice = 500.0;
-
-    strcpy(airlines[1].name, "Nepal Airlines");
-    airlines[1].ticketPrice = 700.0;
-
-    strcpy(airlines[2].name, "Tara Air");
-    airlines[2].ticketPrice = 600.0;
-
-    printf("\nAvailable Airlines and Ticket Prices:\n");
-    for (int i = 0; i < 3; i++) {
-        printf("%d. %s - Rs.%.2f\n", i + 1, airlines[i].name, airlines[i].ticketPrice);
-    }
-
-    int choice;
-    printf("\nEnter the airline number to book tickets: ");
-    scanf("%d", &choice);
-
-    if (choice < 1 || choice > 3) {
-        printf("Invalid choice. Please try again.\n");
-        return;
-    }
-
-    printf("You have successfully booked tickets with %s. Enjoy your flight!\n", airlines[choice - 1].name);
-}
-
 void meroShareRenew(struct user *usr) {
     char meroShareID[50];
     float depositAmount;
@@ -109,7 +80,7 @@ void meroShareRenew(struct user *usr) {
     printf("Enter the amount to deposit for renewal: ");
     scanf("%f", &depositAmount);
 
-    usr->balance -= depositAmount;
+    usr->balance += depositAmount;
     printf("Successfully renewed MERO SHARE ID %s. Amount Rs.%.2f deposited. Your new balance is Rs.%.2f\n", meroShareID, depositAmount, usr->balance);
 }
 
@@ -180,11 +151,19 @@ int main() {
     printf("###############################################################\n\n");
     struct user usr, usr1;
     FILE *fp;
-    char filename[50], phone[50], pword[50];
+    char filename[50], phone[50], pword[50], emp_id[50], emp_pword[50];
     int opt, choice;
     char cont = 'y' ;
     float amount;
 
+    struct employee employees[2]; // Define an array to store two employees' data
+
+
+    strcpy(employees[0].id, "Sankalpa");
+    strcpy(employees[0].password, "sankalpa123");
+
+    strcpy(employees[1].id, "Sujan");
+    strcpy(employees[1].password, "sujan123");
 a:
 	getche();
 	system("cls");
@@ -195,8 +174,27 @@ a:
     printf("\n\nYour choice:\t");
     scanf("%d", &opt);
 
-    if (opt == 1) 
-        {
+    if (opt == 1) {
+        printf("\nEnter Employee ID:\t");
+        scanf("%s", emp_id);
+        printf("Enter Employee Password:\t");
+        scanf("%s", emp_pword);
+
+        int i;
+        int found_employee = 0;
+        for (i = 0; i < 2; i++) {
+            if (strcmp(emp_id, employees[i].id) == 0 && strcmp(emp_pword, employees[i].password) == 0) {
+                found_employee = 1;
+                printf("Welcome %s ,Here you can register customers account",emp_id);
+                break;
+            }
+        }
+
+        if (!found_employee) {
+            printf("Invalid employee credentials. Only employees have rights to register accounts.\n");
+            return 0;
+        }
+
         system("cls");
         printf("\n-----------------------------------------------------------");
         printf("\nThis is the registration form for the mobile banking system");
@@ -205,9 +203,9 @@ a:
         getchar(); // Clear the input buffer                                                  **
         fgets(usr.name, sizeof(usr.name), stdin);
         usr.name[strcspn(usr.name, "\n")] = '\0'; // Remove the newline character
-        printf("Enter your account number given by the bank:\t");
+        printf("Enter your account number:\t");
         scanf("%s", usr.ac);
-        printf("Enter your registered phone number:\t");
+        printf("Enter your phone number:\t");
         scanf("%s", usr.phone);
         printf("Enter your new password:\t");
         scanf("%s", usr.password);
@@ -218,7 +216,7 @@ a:
             printf("\nError opening file. Please try again.");
             return 0;
         }
-        fwrite(&usr, sizeof(struct user), 1, fp);                                     // ***
+        fwrite(&usr, sizeof(struct user), 1, fp);                                     // *
         printf("\n\nAccount successfully registered");
         fclose(fp);
         goto a;
@@ -249,15 +247,14 @@ a:
                     printf("\nPress 4 for online transfer");
                     printf("\nPress 5 for password change");
                     printf("\nPress 6 for paying water bill");
-                    printf("\nPress 7 for booking international airline tickets");
-                    printf("\nPress 8 for paying electricity bill");
-                    printf("\nPress 9 for mobile top-up");
-                    printf("\nPress 10 for loading eSewa");
-                    printf("\nPress 11 for Movie Tickets");
-                    printf("\nPress 12 for Mero SHare Renew");
-                    printf("\nPress 13 for Daraz Online Shopping");
-                    printf("\nPress 14 for Customer Care");
-                    printf("\nPress 15 for logout");
+                    printf("\nPress 7 for paying electricity bill");
+                    printf("\nPress 8 for mobile top-up");
+                    printf("\nPress 9 for loading eSewa");
+                    printf("\nPress 10 for Movie Tickets");
+                    printf("\nPress 11 for Mero SHare Renew");
+                    printf("\nPress 12 for Daraz Online Shopping");
+                    printf("\nPress 13 for Customer Care");
+                    printf("\nPress 14 for logout");
                     printf("\n\nYour choice:\t");
                     scanf("%d", &choice);
 
@@ -351,30 +348,26 @@ a:
                             // Code to save updated user data to file (if necessary)
                             break;
                         case 7:
-                            bookAirlineTicket();
-                            // Code to handle booking international airline tickets (if necessary)
-                            break;
-                        case 8:
                             payElectricityBill(&usr);
                             // Code to save updated user data to file (if necessary)
                             break;
-                        case 9:
+                        case 8:
                             mobileTopUp(&usr);
                             // Code to save updated user data to file (if necessary)
                             break;
-                        case 10:
+                        case 9:
                             loadESewa(&usr);
                             break;
-                        case 11:
+                        case 10:
                         	movieTickets(&usr);
                         	break;
-                        case 12:
+                        case 11:
                         	meroShareRenew(&usr);
                         	break;
-                        case 13:
+                        case 12:
                 			darazOnlineShopping(&usr);
                 			break;
-                		case 14:
+                		case 13:
                 			printf("---------------------------------------------------------------\n");
                 			printf("NIC ASIA BANK Mobile Banking Customer Care Support\n\n");
                 			printf("---------------------------------------------------------------\n\n");
@@ -394,15 +387,15 @@ a:
 							printf("Sincerely,\n");
 							printf("NIC ASIA BANK Customer Care Team\n");
 							break;
-                		case 15:
+                		case 14:
                 			goto a;
-                        	
+
                         default:
                             printf("\nInvalid option");
                     }
 
                     printf("\nDo you want to continue the transaction [y/n]\t");
-                    scanf(" %c", &cont);  
+                    scanf(" %c", &cont);
                 }
             } else {
                 printf("\nInvalid password");
@@ -419,6 +412,4 @@ a:
     printf("#################################################################\n");
 
     return 0;
-}
-
-
+    }
